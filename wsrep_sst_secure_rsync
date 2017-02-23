@@ -106,7 +106,7 @@ then
 
     # Start up socat to forward our rsync connections to the joiner.
     socat TCP4-LISTEN:$RSYNC_DONOR_PORT,reuseaddr,fork \
-    OPENSSL:$SOCAT_ADDR,pf=ip4,cafile=$SOCAT_SSL_DIR/server.crt,cert=$SOCAT_SSL_DIR/client.pem &>/dev/null &
+    OPENSSL:$SOCAT_ADDR,pf=ip4,cafile=$SOCAT_SSL_DIR/ca.pem,cert=$SOCAT_SSL_DIR/server-cert.pem,key=SOCAT_SSL_DIR/server-key.pem &>/dev/null &
     echo $! >$SOCAT_PID
 
     if [ $WSREP_SST_OPT_BYPASS -eq 0 ]
@@ -217,7 +217,7 @@ use chroot = no
 EOF
 
     # Start socat and listen for incoming connections, forwarding them to rsync.
-    socat OPENSSL-LISTEN:$SOCAT_PORT,reuseaddr,fork,pf=ip4,cert=$SOCAT_SSL_DIR/server.pem,cafile=$SOCAT_SSL_DIR/client.crt \
+    socat OPENSSL-LISTEN:$SOCAT_PORT,reuseaddr,fork,pf=ip4,cert=$SOCAT_SSL_DIR/server-cert.pem,key=$SOCAT_SSL_DIR/server-key.pem,cafile=$SOCAT_SSL_DIR/ca.pem \
     TCP4:localhost:$RSYNC_JOINER_PORT &>/dev/null &
     echo $! >$SOCAT_PID
 
